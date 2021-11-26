@@ -1,0 +1,22 @@
+image: nixpkgs/cachix-flakes:latest
+
+variables:
+  GIT_DEPTH: 0
+  GIT_SUBMODULE_STRATEGY: recursive
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
+
+services:
+  - docker:stable-dind
+
+stages:
+  - build
+
+before_script:
+  - mkdir -p /etc/nix && echo "experimental-features = nix-command flakes" > /etc/nix/nix.conf
+
+commit-build:
+  stage: build
+  script:
+    - nix develop --command make release
